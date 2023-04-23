@@ -1,6 +1,7 @@
 package org.example.dao;
 
 import org.example.dao.FoodDao;
+import org.example.model.Food;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -17,13 +18,18 @@ public class FoodDaoImpl implements FoodDao {
     @Override
     public void createTable() throws SQLException {
         Statement statement = connection.createStatement();
-        statement.execute("create table food (" +
+        statement.execute("create table if not exists food (" +
                 "id integer auto_increment, " +
                 "name varchar(100), " +
                 "description varchar(100)," +
                 "calories_per_100 integer, " +
                 "expiration_date date, " +
                 "primary key (id) )");
+    }
+
+    @Override
+    public void create(Food food) throws SQLException {
+
     }
 
     @Override

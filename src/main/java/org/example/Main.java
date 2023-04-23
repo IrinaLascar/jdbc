@@ -1,13 +1,12 @@
 package org.example;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
-import org.example.dao.AnimalDao;
-import org.example.dao.AnimalDaoImpl;
-import org.example.dao.FoodDaoImpl;
-import org.example.dao.FoodDao;
+import org.example.dao.*;
 import org.example.model.Animal;
+import org.example.model.Car;
 
 import java.sql.*;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -36,6 +35,7 @@ public class Main {
 
             AnimalDao animalDao = new AnimalDaoImpl(connection);
             FoodDao foodDao = new FoodDaoImpl(connection);
+            CarDao carDao = new CarDaoImpl(connection);
 
 
             //
@@ -47,14 +47,30 @@ public class Main {
             animalDao.create(new Animal(null, "Lucky", "dog"));
             animalDao.create(new Animal(null, "Lulu", "cat"));
 
+            carDao.createTable();
+            carDao.createCar(new Car(null, "Renault", Date.valueOf("2008-10-07")));
+            carDao.createCar(new Car(null, "Renault1", Date.valueOf("2008-10-09")));
+
+            carDao.updateCar(new Car(1, "Toyota", Date.valueOf("2013-05-15")));
+
+            carDao.deleteCar(3);
+
+
+            LOGGER.info("The method for delete car was successful");
 
             foodDao.createTable();
 
 
-
             LOGGER.info("Create tables animals and food was successful");
+
             statement.execute("insert into animals (name, species) values (\"Labus\", \"Dog\")");
             LOGGER.info("Data insertion was successful"); //creare baza de date si inserare date
+
+            List<Car> cars = carDao.readAllCars();
+            System.out.println("Masinile din baza de date sunt: ");
+            for (Car c : cars) {
+                System.out.println(c);
+            }
 
             statement.execute("Update Animals Set Name = \"Oscar\" where id=1");
 
@@ -100,7 +116,7 @@ public class Main {
                 System.out.print("expiră la " + rs2.getDate(5));
                 System.out.println();
             }
-
+            carDao.dropTable();
             animalDao.dropTable();
             foodDao.dropTable();
             LOGGER.info("Tables dropped successfully");

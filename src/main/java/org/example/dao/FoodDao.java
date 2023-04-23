@@ -1,5 +1,7 @@
 package org.example.dao;
 
+import org.example.model.Food;
+
 import java.sql.SQLException;
 
 // Food Data Access Object <- clasă pentru a accesa date din "foods"
@@ -11,7 +13,7 @@ public interface FoodDao {
     void createTable() throws SQLException;
 
     // adaugare date            CREATE foods
-void create ()
+    void create(Food food) throws SQLException;
     // gasire date              READ foods
 
     // modificare date          UPDATE foods
