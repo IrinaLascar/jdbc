@@ -1,4 +1,4 @@
-package model;
+package org.example.model;
 //reprezentare a unei instante
 public class Animal {
     private Integer id; // nu folosim int ptr a evita nullPointerException

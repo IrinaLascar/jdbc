@@ -1,6 +1,11 @@
 package org.example;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
+import org.example.dao.AnimalDao;
+import org.example.dao.AnimalDaoImpl;
+import org.example.dao.FoodDaoImpl;
+import org.example.dao.FoodDao;
+import org.example.model.Animal;
 
 import java.sql.*;
 import java.util.logging.Logger;
@@ -29,22 +34,30 @@ public class Main {
             Connection connection = dataSource.getConnection();
             LOGGER.log(Level.INFO, "Connection successful");
 
+            AnimalDao animalDao = new AnimalDaoImpl(connection);
+            FoodDao foodDao = new FoodDaoImpl(connection);
+
+
             //
             Statement statement = connection.createStatement();
-            statement.execute("create table if not exists animals (id integer auto_increment, name varchar(100), species varchar(100), primary key (id))");
-            LOGGER.info("Create table animals was successful");
+
+            animalDao.createTable();
+
+            animalDao.create(new Animal(null, "Rex", "dog"));
+            animalDao.create(new Animal(null, "Lucky", "dog"));
+            animalDao.create(new Animal(null, "Lulu", "cat"));
+
+
+            foodDao.createTable();
+
+
+
+            LOGGER.info("Create tables animals and food was successful");
             statement.execute("insert into animals (name, species) values (\"Labus\", \"Dog\")");
             LOGGER.info("Data insertion was successful"); //creare baza de date si inserare date
 
             statement.execute("Update Animals Set Name = \"Oscar\" where id=1");
 
-            statement.execute("Create table if not exists food (" +
-                    "id integer auto_increment, " +
-                    "name varchar(100), " +
-                    "description varchar(100), " +
-                    "calories_per_100 integer, " +
-                    "expiration_date date, " +
-                    "primary key (id) )");
 
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "insert into food (name, description, calories_per_100, expiration_date) values (?, ?, ?, ?)");
@@ -79,17 +92,18 @@ public class Main {
 
             ResultSet rs2 = statement.executeQuery("SELECT * FROM food where calories_per_100 < 600 ");
             System.out.println("Foods: ");
-            while (rs2.next()){
+            while (rs2.next()) {
                 System.out.print("id. " + rs2.getInt(1) + " - ");
                 System.out.print(rs2.getString(2) + " - ");
                 System.out.print(rs2.getString(3) + " - ");
-                System.out.print(rs2.getInt(4) +"kcal per 100g - ");
+                System.out.print(rs2.getInt(4) + "kcal per 100g - ");
                 System.out.print("expiră la " + rs2.getDate(5));
                 System.out.println();
             }
 
-            statement.execute("drop table animals");
-            statement.execute("drop table food");
+            animalDao.dropTable();
+            foodDao.dropTable();
+            LOGGER.info("Tables dropped successfully");
 
         } catch (SQLException sqlException) {
             LOGGER.log(Level.SEVERE, "Error when connecting to database " + dbName
